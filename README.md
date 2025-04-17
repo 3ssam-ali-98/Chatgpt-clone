@@ -42,5 +42,4 @@ python app.py
 
 ## Author
 
-Essam Eldin Ali  
-[GitHub](https://github.com/3ssam-ali-98)
+Essam Eldin Ali  [GitHub](https://github.com/3ssam-ali-98)
