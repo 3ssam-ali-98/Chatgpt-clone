@@ -1,0 +1,147 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+}
+
+#title {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#chat-container {
+    width: 50%;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+#chat-box {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    background: white; /* Changed from #ecf0f1 to white */
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    max-width: 70%;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 5px 0;
+    word-wrap: break-word;
+}
+
+/* User messages on the right */
+.user-message {
+    background-color: #3498db;
+    color: white;
+    align-self: flex-end;
+    text-align: right;
+}
+
+/* Bot messages on the left */
+.bot-message {
+    background-color: #2ecc71;
+    color: white;
+    align-self: flex-start;
+    text-align: left;
+}
+
+#input-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: white;
+    border-top: 1px solid #ddd;
+}
+
+#user-input {
+    flex: 1;
+    min-height: 40px;
+    max-height: 150px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+    resize: none;
+    overflow-y: auto;
+}
+
+#send-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* Ensure everything is side-by-side */
+#main-container {
+    display: flex;
+    width: 90%;
+    height: 80vh;
+}
+
+/* Style the sidebar */
+#sidebar {
+    width: 250px;
+    background: #2c3e50;
+    color: white;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    border-radius: 15px;
+}
+
+/* New Chat button */
+#new-chat-btn {
+    width: 100%;
+    padding: 10px;
+    background: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+#new-chat-btn:hover {
+    background: #2980b9;
+}
+
+/* Style chat list */
+.chat-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #34495e;
+}
+
+.chat-item:hover {
+    background: #34495e;
+}
+
+/* Chat container */
+#chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: white;
+}
+

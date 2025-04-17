@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1 id="title">AI Assistant</h1>
+
+<div id="main-container">
+    <!-- Sidebar for chat history -->
+    <div id="sidebar">
+        <h2>Chat History</h2>
+        <button id="new-chat-btn" onclick="startNewChat()">+ New Chat</button>
+        <div id="chat-list"></div>
+    </div>
+
+    <!-- Chatbox container -->
+    <div id="chat-container">
+        <div id="chat-box"></div>
+    
+        <div id="input-container">
+            <input type="file" id="file-input" style="display: none;" onchange="handleFileSelection(event)">
+            <button id="attach-btn" onclick="document.getElementById('file-input').click()">📎</button>
+            <textarea id="user-input" placeholder="Type a message..." oninput="adjustInputHeight()" onkeypress="handleKeyPress(event)"></textarea>
+            <button id="send-btn" onclick="sendMessage()">
+                <img src="{{ url_for('static', filename='send-icon.png') }}" alt="Send" width="25px">
+            </button>
+        </div>
+        <p id="file-name"></p>
+    </div>
+</div>
+
+    <script>
+        let chatId = null;
+
+        let selectedFile = null;  // Global variable to store the file
+
+        function handleFileSelection(event) {
+            selectedFile = event.target.files[0]; 
+            let fileNameDisplay = document.getElementById("file-name");
+            
+            if (selectedFile) {
+                fileNameDisplay.innerText = `📎 ${selectedFile.name}`;
+            } else {
+                fileNameDisplay.innerText = "";
+            }
+        }
+
+        async function sendMessage() {
+            let inputField = document.getElementById("user-input");
+            let userText = inputField.value.trim();
+            let chatBox = document.getElementById("chat-box");
+            let fileNameDisplay = document.getElementById("file-name");
+    
+            if (!userText && !selectedFile) return; // Ensure at least text or file is sent
+    
+            let formData = new FormData();
+            formData.append("message", userText);
+
+            if (selectedFile) formData.append("file", selectedFile);
+
+            if (window.chatId) {
+                formData.append("chat_id", window.chatId);
+            }
+    
+            let response = await fetch("/chat", {
+                method: "POST",
+                body: formData 
+            });
+    
+            let data = await response.json();
+    
+            if (userText) {
+                chatBox.innerHTML += `<div class="message user-message">${userText}</div>`;
+            }
+    
+            if (selectedFile) {
+                let fileType = selectedFile.type.split("/")[0];
+    
+                if (fileType === "image") {
+                    chatBox.innerHTML += `<div class="message user-message">
+                        <img src="${URL.createObjectURL(selectedFile)}" style="max-width: 200px; border-radius: 8px;">
+                    </div>`;
+                } else {
+                    chatBox.innerHTML += `<div class="message user-message">
+                        📎 ${selectedFile.name}
+                    </div>`;
+                }
+            }
+    
+            chatBox.innerHTML += `<div class="message bot-message">${data.reply}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+    
+            // Reset fields
+            inputField.value = "";
+            fileNameDisplay.innerText = "";
+            selectedFile = null;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function adjustInputHeight() {
+            let inputField = document.getElementById("user-input");
+            inputField.style.height = "40px"; // Set min height
+            inputField.style.height = inputField.scrollHeight + "px";
+        }
+        // Load past chats when the page loads
+async function loadChatHistory() {
+    let response = await fetch("/chats");
+    let data = await response.json();
+    let chatList = document.getElementById("chat-list");
+
+    chatList.innerHTML = "";  // Clear old list
+
+    data.chats.forEach(chat => {
+        let chatItem = document.createElement("div");
+        chatItem.classList.add("chat-item");
+        chatItem.textContent = chat.title;
+        chatItem.onclick = () => loadChat(chat.id);
+        chatList.appendChild(chatItem);
+    });
+}
+
+// Load selected chat messages
+        async function loadChat(chatId) {
+            let response = await fetch(`/messages/${chatId}`);
+            let data = await response.json();
+
+            let chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML = "";  // Clear previous messages
+
+            data.messages.forEach(msg => {
+                let messageDiv = document.createElement("div");
+                messageDiv.classList.add("message", msg.role === "user" ? "user-message" : "bot-message");
+                messageDiv.innerHTML = msg.content;
+                chatBox.appendChild(messageDiv);
+            });
+
+            window.chatId = chatId;  // ✅ Store selected chat ID
+        }
+        async function startNewChat() {
+            let response = await fetch("/new-chat", { method: "POST" });
+            let data = await response.json();
+            
+            window.chatId = data.id;  // ✅ Reset chat ID
+            document.getElementById("chat-box").innerHTML = "";  // Clear old messages
+            loadChatHistory();  // Refresh chat list
+        }
+
+// Load history when the page loads
+window.onload = loadChatHistory;
+
+    </script>
+</body>
+</html>
